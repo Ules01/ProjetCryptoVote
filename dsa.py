@@ -14,20 +14,31 @@ def H(message):
     h = SHA256.new(message)
     return (int(h.hexdigest(), 16))
 
-def DSA_generate_nonce(("""TBC""")):
-
-    return ("""TBC""")
 
 
-def DSA_generate_keys("""TBC"""):
+def DSA_generate_nonce():
+    return randint(1, PARAM_Q - 1)
 
-    return """TBC"""
 
 
-def DSA_sign("""TBC"""):
+def DSA_generate_keys():
+    x = randint(1, PARAM_Q - 2)    #private key
+    X = pow(PARAM_G, x, PARAM_P)      #public key
+    return X
 
-    return """TBC"""    
 
-def DSA_verify("""TBC"""):
+def DSA_sign(m):
+    s = 0
+    r = 0
+    k = 0
+    X = DSA_generate_keys()
+    while s == 0:
+        while r == 0:
+            k = DSA_generate_nonce()
+            r = pow(PARAM_G, k, PARAM_P) % PARAM_Q
+        s = ((H(m) + X * r) * pow(k, -1, PARAM_Q)) % PARAM_Q
+    return (r, s)
 
-    return """TBC"""
+def DSA_verify():
+    #TODO
+    return

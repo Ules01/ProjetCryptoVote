@@ -1,1 +1,3 @@
 venv/
+'External Librairies/'
+__pycache__/
