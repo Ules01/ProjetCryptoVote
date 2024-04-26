@@ -19,26 +19,30 @@ def H(message):
 def DSA_generate_nonce():
     return randint(1, PARAM_Q - 1)
 
-
-
 def DSA_generate_keys():
     x = randint(1, PARAM_Q - 2)    #private key
     X = pow(PARAM_G, x, PARAM_P)      #public key
-    return X
+    return X, x
 
 
 def DSA_sign(m):
     s = 0
     r = 0
     k = 0
-    X = DSA_generate_keys()
+    X, x = DSA_generate_keys()
     while s == 0:
         while r == 0:
             k = DSA_generate_nonce()
             r = pow(PARAM_G, k, PARAM_P) % PARAM_Q
-        s = ((H(m) + X * r) * pow(k, -1, PARAM_Q)) % PARAM_Q
+        s = ((H(m) + x * r) * pow(k, -1, PARAM_Q)) % PARAM_Q
     return (r, s)
 
-def DSA_verify():
-    #TODO
-    return
+def DSA_verify(X, r, s, m):
+    if 0 >= r or r >= PARAM_Q or 0 >= s or s >= PARAM_Q:
+        return False
+    print("First")
+    u1 = (H(m) * pow(s, -1, PARAM_Q)) % PARAM_Q
+    u2 = (r * pow(s, -1, PARAM_Q)) % PARAM_Q
+    v = ((pow(PARAM_G, u1, PARAM_P) * pow(X, u2, PARAM_P)) % PARAM_P) % PARAM_Q
+    print(v)
+    return v == r
