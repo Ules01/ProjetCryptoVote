@@ -20,20 +20,39 @@ def bruteLog(g, c, p):
             return i + 1
     return -1
 
-def EG_generate_keys("""TBC"""):
-
-    return """TBC"""
+def EG_generate_keys():
+    u = randint(1, PARAM_P - 1)
+    U = pow(PARAM_G, u, PARAM_P)
+    return U, u
 
 ## multiplicative version
-def EGM_encrypt("""TBC"""):
-
-    return """TBC"""
+def EGM_encrypt(m, U):
+    r = randint(1, PARAM_P - 1)
+    return (pow(PARAM_G, r, PARAM_P), m * pow(U, r, PARAM_P) % PARAM_P)
 
 ## additive version
-def EGA_encrypt("""TBC"""):
-    return """TBC"""
+def EGA_encrypt(m, U):
+    r = randint(1, PARAM_P - 1)
+    return (pow(PARAM_G, r, PARAM_P), (pow(PARAM_G, m, PARAM_P) * pow(U, r, PARAM_P)) % PARAM_P)
 
 
-def EG_decrypt("""TBC"""):
-    return """TBC"""
+def EG_decrypt(c1, c2, u):
+    c1u = pow(c1, u, PARAM_P)
+    return (c2 * pow(c1u, -1, PARAM_P)) % PARAM_P
 
+
+"""
+#Test
+
+m1 = 0x2661b673f687c5c3142f806d500d2ce57b1182c9b25bfe4fa09529424b
+m2 = 0x1c1c871caabca15828cf08ee3aa3199000b94ed15e743c3
+
+U, u = EG_generate_keys()
+(r1, c1) = EGM_encrypt(m1, U)
+(r2, c2) = EGM_encrypt(m2, U)
+(r3, c3) = (r1 * r2 % PARAM_P, c1 * c2 % PARAM_P)
+m3 = EG_decrypt(r3, c3, u)
+print(m3 == m1 * m2 % PARAM_P)
+print(int_to_bytes(m3))
+
+"""
