@@ -41,6 +41,7 @@ def EG_decrypt(c1, c2, u):
     return (c2 * pow(c1u, -1, PARAM_P)) % PARAM_P
 
 
+
 """
 #Test
 
