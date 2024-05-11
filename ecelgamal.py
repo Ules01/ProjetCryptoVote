@@ -28,7 +28,6 @@ def ECEG_generate_keys():
     Uu, Uv = mult(u, BaseU, BaseV, p)
     return Uu, Uv, u
 
-
 def ECEG_encrypt(m, Uu, Uv):
     r = randint(1, p - 1)
     c1u, c1v = mult(r, BaseU, BaseV, p)
@@ -36,7 +35,7 @@ def ECEG_encrypt(m, Uu, Uv):
     Emu, Emv = EGencode(m)
     c2u, c2v = add(Emu, Emv, c2pu, c2pv, p)
     return c1u, c1v, c2u, c2v
-
+    pass
 
 def ECEG_decrypt(c1u, c1v, c2u, c2v, u):
     c1uu, c1uv = mult(u, c1u, c1v, p)

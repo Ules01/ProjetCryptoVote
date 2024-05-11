@@ -16,12 +16,13 @@ def H(message):
 def ECDSA_generate_nonce():
     return randint(1, ORDER - 1)
 
-
+# Xu and Xv are the public key coordinates, x is the private key
 def ECDSA_generate_keys():
     x = randint(1, ORDER - 2)
     Xu, Xv = mult(x, BaseU, BaseV, p)
     return Xu, Xv, x
 
+# r and s are the signature, x is the private key, m is the message
 def ECDSA_sign(m, x):
     s = 0
     r = 0
