@@ -28,13 +28,16 @@ def EG_generate_keys():
 ## multiplicative version
 def EGM_encrypt(m, U):
     r = randint(1, PARAM_P - 1)
-    return (pow(PARAM_G, r, PARAM_P), m * pow(U, r, PARAM_P) % PARAM_P)
+    c1 = pow(PARAM_G, r, PARAM_P)
+    c2 = (m * pow(U, r, PARAM_P)) % PARAM_P
+    return (c1, c2)
 
 ## additive version
 def EGA_encrypt(m, U):
     r = randint(1, PARAM_P - 1)
-    return (pow(PARAM_G, r, PARAM_P), (pow(PARAM_G, m, PARAM_P) * pow(U, r, PARAM_P)) % PARAM_P)
-
+    c1 = pow(PARAM_G, r, PARAM_P)
+    c2 = (pow(PARAM_G, m, PARAM_P) * pow(U, r, PARAM_P)) % PARAM_P
+    return (c1, c2)
 
 def EG_decrypt(c1, c2, u):
     c1u = pow(c1, u, PARAM_P)
