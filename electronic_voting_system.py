@@ -56,6 +56,7 @@ for i in range(NUM_VOTERS):
     encrypted_ballot = vote_and_encrypt(candidate_choice, Uu, Uv)
     Xu, Xv, private_key = signing_keys[i]  # Public and private key for signing
     ballot_signature = sign_ballot(encrypted_ballot, private_key)
+
     ballots.append(encrypted_ballot)
     signatures.append((Xu, Xv, ballot_signature))  # Store public key components with signature
 
@@ -66,7 +67,6 @@ combined_votes = [
         [ballot[i] for ballot in ballots]
     ) for i in range(NUM_CANDIDATES)]
 
-
 # Homomorphically combine encrypted votes
 combined_votes = [
     reduce(
@@ -75,14 +75,20 @@ combined_votes = [
     ) for i in range(NUM_CANDIDATES)
 ]
 
+
 # Verify signatures
 verified_ballots = [
     verify_ballot(signatures[i][0], signatures[i][1], signatures[i][2], ballots[i]) 
     for i in range(NUM_VOTERS)]
 
+print("*****************************************")
+
 
 # Decrypt combined votes to find the final tally
 final_tally = [bruteECLog(vote[2], vote[3], p) for vote in combined_votes]
+
+print("*****************************************")
+
 
 print("Final tally:", final_tally)
 print("Ballot verification results:", verified_ballots)
