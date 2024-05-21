@@ -15,7 +15,6 @@ def bruteECLog(C1, C2, p):
         if s1 == C1 and s2 == C2:
             return i
         s1, s2 = add(s1, s2, BaseU, BaseV, p)
-        print(i + 1)
     return -1
 
 def EGencode(message):
