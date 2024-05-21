@@ -38,7 +38,6 @@ def ECDSA_sign(m, x):
 def ECDSA_verify(Xu, Xv, r, s, m):
     if 0 >= r or r >= ORDER or 0 >= s or s >= ORDER:
         return False
-    print("first")
     u1 = (H(m) * pow(s, -1, ORDER)) % ORDER
     u2 = (r * pow(s, -1, ORDER)) % ORDER
     w1u, w1v = mult(u1, BaseU, BaseV, p)
