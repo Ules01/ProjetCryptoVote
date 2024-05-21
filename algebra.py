@@ -16,6 +16,7 @@ def mod_inv(a, n):
 
     if r > 1:
         raise Exception("a is not invertible")
+        exit(1)
     if t < 0:
         t = t + n
     return t

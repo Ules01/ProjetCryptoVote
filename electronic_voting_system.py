@@ -1,54 +1,70 @@
 from functools import reduce
-from ecelgamal import ECEG_generate_keys, ECEG_encrypt, ECEG_decrypt,bruteECLog
 from random import randint
-from rfc7748 import add
+from rfc7748 import add, mult, computeVcoordinate
+from ecelgamal import ECEG_generate_keys, ECEG_encrypt, ECEG_decrypt, bruteECLog
+from ecdsa import ECDSA_generate_keys, ECDSA_sign, ECDSA_verify
+from algebra import int_to_bytes
+from utils import time_it
+import math
 
 # Configuration
-NUM_VOTERS = 5
-NUM_CANDIDATES = 2
 p = 2**255 - 19
 
-votes = []
-for i in range(NUM_VOTERS):
-    #Initialise the vote table
-    vote = [0] * NUM_CANDIDATES
-    #Create a random vote
-    voteIndex = randint(0, NUM_CANDIDATES - 1)
-    vote[voteIndex] = 1
-    votes.append(vote)
+def generate_votes(num_voters, num_candidates):
+    votes = []
+    for _ in range(num_voters):
+        vote_index = randint(0, num_candidates - 1)
+        vote = [0] * num_candidates
+        vote[vote_index] = 1
+        votes.append(vote)
+    return votes
 
+def encrypt_votes(votes, num_voters, num_candidates, p):
+    ballots = [[0] * num_voters for _ in range(num_candidates)]
+    for i in range(num_voters):
+        for j in range(num_candidates):
+            ballots[j][i] = votes[i][j]
 
-print("Votes:")
-for vote in votes:
-    print(vote)
-print()
+    encrypted_ballots = []
+    for ballot in ballots:
+        Uu, Uv, u = ECEG_generate_keys()
+        encrypts = []
+        for vote in ballot:
+            encrypts.append(ECEG_encrypt(vote, Uu, Uv))
+        encrypted_ballots.append((encrypts, u))
+    return encrypted_ballots
 
-#Create ballots from the votes list
-ballots = [[0] * NUM_VOTERS for _ in range(NUM_CANDIDATES)]
-for i in range(NUM_VOTERS):
-    for j in range (NUM_CANDIDATES):
-        ballots[j][i] = votes[i][j]
+def decrypt_and_count_votes(encrypted_ballots, p):
+    results = []
+    for encrypts, u in encrypted_ballots:
+        ru, rv, cu, cv = encrypts[0]
+        for i in range(1, len(encrypts)):
+            oldRu, oldRv, oldCu, oldCv = encrypts[i]
+            ru, rv = add(ru, rv, oldRu, oldRv, p)
+            cu, cv = add(cu, cv, oldCu, oldCv, p)
 
-print("Ballots:")
-for ballot in ballots:
-    print(ballot)
-print()
+        m1, m2 = ECEG_decrypt(ru, rv, cu, cv, u)
+        results.append(bruteECLog(m1, m2, p))
+    return results
 
-print("Number of votes:")
-for ballot in ballots:
-    #encrypt
-    Uu, Uv, u = ECEG_generate_keys()
-    encrypts = []
-    for vote in ballot:
-        encrypts.append(ECEG_encrypt(vote, Uu, Uv))
+def simulate_electronic_voting():
+    num_voters = 10
+    num_candidates = 5
+    p = 2**255 - 19
 
-    #decrypt
-    ru, rv, cu, cv = encrypts[0]
-    for i in range(1, NUM_VOTERS):
-        oldRu, oldRv, oldCu, oldCv = encrypts[i]
-        ru, rv = add(ru, rv, oldRu, oldRv, p)
-        cu, cv = add(cu, cv, oldCu, oldCv, p)
+    # Generate and print votes
+    votes = generate_votes(num_voters, num_candidates)
+    print("Votes:")
+    for vote in votes:
+        print(vote)
+    print()
 
-    m1, m2 = ECEG_decrypt(ru, rv, cu, cv, u)
-    print(bruteECLog(m1, m2, p))
+    # Encrypt votes and print ballots
+    encrypted_ballots = encrypt_votes(votes, num_voters, num_candidates, p)
 
+    # Decrypt and count votes
+    print("Number of votes:")
+    final_tally = decrypt_and_count_votes(encrypted_ballots, p)
+    print(final_tally)
+
+simulate_electronic_voting()
