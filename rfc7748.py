@@ -2,26 +2,23 @@ from algebra import mod_inv, mod_sqrt
 
 ### add (and double)
 
-def add(x1:int, y1:int, x2:int, y2:int, p:int):
+def add(x1:int, y1:int, x2:int, y2:int, p: int):
     a = 486662
-    # Cas où un des points est le point à l'infini
-    if (x1, y1) == (1, 0):  # Point à l'infini
+    if (x1, y1) == (1, 0):
         return x2, y2
-    if (x2, y2) == (1, 0):  # Point à l'infini
+    if (x2, y2) == (1, 0):
         return x1, y1
-
-    # Cas où les points sont opposés
     if x1 == x2 and y1 != y2:
-        return (1, 0)  # Point à l'infini
-
-    # Doublement du point
+        return (1, 0)
     if x1 == x2 and y1 == y2:
-        if y1 == 0:  # La tangente est verticale
-            return (1, 0)  # Point à l'infini
-        m = ((3 * x1**2 + 2 * a * x1 + 1) % p) * mod_inv(2 * y1, p)
-        x3 = (m**2 - a - 2 * x1) % p
-        y3 = (m * (x1 - x3) - y1) % p
-        return x3, y3
+        m = ((3 * x1**2 + 2*a*x1 + 1)%p) * mod_inv(2 * y1, p)
+        x3 = (m**2 - a - 2*x1)%p
+    else:
+        m = ((y2 - y1)%p) * mod_inv((x2 - x1)%p, p)
+        x3 = (m**2 - a - x1 - x2)%p
+    
+    y3 = (m*(x1 - x3) - y1)%p
+    return (x3, y3)
 
     # Addition générale
     m = ((y2 - y1) % p) * mod_inv(x2 - x1, p)
