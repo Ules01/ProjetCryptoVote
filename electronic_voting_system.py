@@ -10,8 +10,10 @@ p = 2**255 - 19
 
 votes = []
 for i in range(NUM_VOTERS):
-    voteIndex = randint(0, NUM_CANDIDATES - 1)
+    #Initialise the vote table
     vote = [0] * NUM_CANDIDATES
+    #Create a random vote
+    voteIndex = randint(0, NUM_CANDIDATES - 1)
     vote[voteIndex] = 1
     votes.append(vote)
 
@@ -21,6 +23,7 @@ for vote in votes:
     print(vote)
 print()
 
+#Create ballots from the votes list
 ballots = [[0] * NUM_VOTERS for _ in range(NUM_CANDIDATES)]
 for i in range(NUM_VOTERS):
     for j in range (NUM_CANDIDATES):
@@ -30,8 +33,6 @@ print("Ballots:")
 for ballot in ballots:
     print(ballot)
 print()
-
-#ballots = [[1, 0, 1, 1, 0]]
 
 print("Number of votes:")
 for ballot in ballots:

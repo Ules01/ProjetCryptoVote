@@ -43,10 +43,10 @@ def ECEG_decrypt(c1u, c1v, c2u, c2v, u):
 
 
 """
-m1 = 1
+m1 = 0
 m2 = 0
-m3 = 1
-m4 = 1
+m3 = 0
+m4 = 0
 m5 = 0
 
 Uu, Uv, u = ECEG_generate_keys()
@@ -65,5 +65,4 @@ cu, cv = add(c12u, c12v, c34u, c34v, p)
 
 m61, m62 = ECEG_decrypt(ru, rv, cu, cv, u)
 print(bruteECLog(m61, m62, p))
-
 """
