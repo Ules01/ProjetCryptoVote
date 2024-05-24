@@ -42,18 +42,20 @@ def EG_decrypt(c1, c2, u):
 
 
 
-"""
+
 #Test
 
-m1 = 0x2661b673f687c5c3142f806d500d2ce57b1182c9b25bfe4fa09529424b
-m2 = 0x1c1c871caabca15828cf08ee3aa3199000b94ed15e743c3
+m1 = 0
+m2 = 1 
 
+"""
 U, u = EG_generate_keys()
-(r1, c1) = EGM_encrypt(m1, U)
-(r2, c2) = EGM_encrypt(m2, U)
+(r1, c1) = EGA_encrypt(m1, U)
+(r2, c2) = EGA_encrypt(m2, U)
 (r3, c3) = (r1 * r2 % PARAM_P, c1 * c2 % PARAM_P)
 m3 = EG_decrypt(r3, c3, u)
-print(m3 == m1 * m2 % PARAM_P)
-print(int_to_bytes(m3))
-
+#print(m3 == m1 + m2 % PARAM_P)
+print(m3)
+print(m3 - PARAM_G)
+print(bruteLog(PARAM_G, m3, PARAM_P))
 """
