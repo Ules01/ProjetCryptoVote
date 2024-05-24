@@ -4,6 +4,7 @@ from rfc7748 import add, mult, computeVcoordinate
 from ecelgamal import ECEG_generate_keys, ECEG_encrypt, ECEG_decrypt, bruteECLog
 from elgamal import EGM_encrypt, EGA_encrypt, EG_generate_keys, PARAM_P, EG_decrypt, bruteLog, PARAM_G, bruteLog
 from ecdsa import ECDSA_generate_keys, ECDSA_sign, ECDSA_verify
+from dsa import DSA_generate_keys, DSA_sign, DSA_verify
 from algebra import int_to_bytes, mod_inv
 from utils import time_it
 import math
@@ -16,6 +17,8 @@ NUMBER_CANDIDATES = 5
 
 encrypt_keys = []
 
+
+#This function will generate keys after deleting the existing ones
 def generate_keys(var_encryption):
     encrypt_keys.clear()  # Clear any existing keys
     if var_encryption == "ECG":
@@ -25,18 +28,28 @@ def generate_keys(var_encryption):
         for i in range(NUMBER_CANDIDATES):
             encrypt_keys.append(EG_generate_keys())
 
-def sign_vote(encrypted_vote, private_key):
+
+#This function will sign the vote
+def sign_vote(encrypted_vote, private_key, var_signature):
     ballot_message = str(encrypted_vote).encode()  # Encode the ballot data
-    signature = ECDSA_sign(ballot_message, private_key)
+    if var_signature == "ECDSA":
+        signature = ECDSA_sign(ballot_message, private_key)
+    else:
+        signature = DSA_sign(ballot_message, private_key)
     return signature
 
-def verify_vote(encrypted_vote, signature, public_key):
+def verify_vote(encrypted_vote, signature, public_key, var_signature):
     ballot_message = str(encrypted_vote).encode()
-    Xu, Xv = public_key
-    verified = ECDSA_verify(Xu, Xv, signature[0], signature[1], ballot_message)
+    if var_signature == "ECDSA":
+        Xu, Xv = public_key
+        verified = ECDSA_verify(Xu, Xv, signature[0], signature[1], ballot_message)
+    else:
+        X = public_key
+        verified = DSA_verify(X, signature[0], signature[1], ballot_message)
+
     return verified
 
-def generate_single_vote(var_encryption):
+def generate_single_vote(var_encryption, var_signature):
     vote_index = randint(0, NUMBER_CANDIDATES - 1)
     vote = [0] * NUMBER_CANDIDATES
     vote[vote_index] = 1
@@ -52,18 +65,27 @@ def generate_single_vote(var_encryption):
             encrypt_vote.append(EGA_encrypt(vote[i], U))
 
     # Generate keys for signing
-    signer_keys = ECDSA_generate_keys()
-    public_keys = (signer_keys[0], signer_keys[1])
-    private_keys = signer_keys[2]
-    signature = sign_vote(encrypt_vote, private_keys)
+
+    if var_signature == "ECDSA":
+        signer_keys = ECDSA_generate_keys()
+        public_keys = (signer_keys[0], signer_keys[1])
+        private_keys = signer_keys[2]
+    
+    else:
+        signer_keys = DSA_generate_keys()
+        public_keys = (signer_keys[0])
+        private_keys = signer_keys[1]
+
+    
+    signature = sign_vote(encrypt_vote, private_keys, var_signature)
     return encrypt_vote, signature, public_keys
 
-def generate_votes(var_encryption):
+def generate_votes(var_encryption, var_signature):
     encrypt_votes = []
     print("votes:")
     for _ in range(NUMBER_VOTERS):
-        encrypt_vote, signature, public_key = generate_single_vote(var_encryption)
-        if verify_vote(encrypt_vote, signature, public_key):
+        encrypt_vote, signature, public_key = generate_single_vote(var_encryption, var_signature)
+        if verify_vote(encrypt_vote, signature, public_key, var_signature):
             print("Vote accepted")
             encrypt_votes.append(encrypt_vote)
     print()
@@ -130,7 +152,7 @@ def simulate_electronic_voting():
     generate_keys(var_encryption)
 
     # Generate and print votes
-    votes = generate_votes(var_encryption)
+    votes = generate_votes(var_encryption, var_signature)
 
     # Encrypt votes
     encrypted_ballots = create_ballots(votes)
